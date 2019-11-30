@@ -119,6 +119,11 @@
         private System.Windows.Forms.Button Decrypt_Button;
         private System.Windows.Forms.Button Save_Button;
         private System.Windows.Forms.Button Encrypt_Button;
+        private string sampleText;
+        private byte[] buffer;
+        private byte[] Key;
+        private byte[] IV;
+
     }
 }
 
