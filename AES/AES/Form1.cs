@@ -122,7 +122,7 @@ namespace AES
 
             }
             sampleText = plaintext;
-            MessageBox.Show(sampleText);
+       //     MessageBox.Show(sampleText);
             buffer = Encoding.ASCII.GetBytes(plaintext);
         }
 
