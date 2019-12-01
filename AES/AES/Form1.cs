@@ -64,11 +64,11 @@ namespace AES
                     filePath = saveFileDialog1.FileName;
                     var fileStream = saveFileDialog1.OpenFile();
 
-                    using (StreamWriter writer = new StreamWriter(fileStream))
+                    using (BinaryWriter writer = new BinaryWriter(fileStream))
                     {
                         writer.Write(buffer);
-                        writer.Write('\n');
-                        writer.Write(Key);
+                        writer.Flush();
+                        writer.Close();
                     }
                 }
                 catch (IOException) { }
@@ -123,6 +123,7 @@ namespace AES
             }
             sampleText = plaintext;
             MessageBox.Show(sampleText);
+            buffer = Encoding.ASCII.GetBytes(plaintext);
         }
 
         private void button4_Click(object sender, EventArgs e)
