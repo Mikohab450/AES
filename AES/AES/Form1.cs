@@ -24,7 +24,7 @@ namespace AES
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void LoadFileButton(object sender, EventArgs e)
         {
 
             DialogResult res = openFileDialog1.ShowDialog();
@@ -45,12 +45,12 @@ namespace AES
                 catch (IOException)
                 { }
                 //MessageBox.Show(fileContent,filePath,MessageBoxButtons.OK);
-                label1.Text = filePath;
                 sampleText = fileContent;
+              
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void SaveFileButton(object sender, EventArgs e)
         {
 
             DialogResult res = saveFileDialog1.ShowDialog();
@@ -72,13 +72,23 @@ namespace AES
                     }
                 }
                 catch (IOException) { }
+       
             }
+            try
+            {
+                using (Stream file = File.OpenWrite("here.txt"))
+                {
+                    file.Write(fileBytes, 0, fileBytes.Length);
+                }
+            }
+            catch (IOException)
+            { }
         }
   
         
      
 
-        private void button2_Click(object sender, EventArgs e)
+        private void DecryptButton(object sender, EventArgs e)
         {
            // Aes myAes = Aes.Create();
             //myAes.GenerateKey();
@@ -126,14 +136,14 @@ namespace AES
             buffer = Encoding.ASCII.GetBytes(plaintext);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void EncryptButton(object sender, EventArgs e)
         {
             Aes myAes = Aes.Create();
             myAes.GenerateKey();
             myAes.GenerateIV();
-            Key = myAes.Key;
+           // Key = myAes.Key;
             IV = myAes.IV;
-
+            Key = myAes.Key;
             // Check arguments.
             if (sampleText == null || sampleText.Length <= 0)
                 throw new ArgumentNullException("plainText");
@@ -174,6 +184,31 @@ namespace AES
             buffer = encrypted;
             sampleText = Encoding.ASCII.GetString(encrypted);
             MessageBox.Show(sampleText);
+        }
+
+        private void LoadKeyButton(object sender, EventArgs e)
+        {
+            DialogResult res = openFileDialog2.ShowDialog();
+            if (res == DialogResult.OK)
+            {
+                string filePath = string.Empty;
+                string fileContent = string.Empty;
+
+                try
+                {
+                    filePath = openFileDialog2.FileName;
+                    var fileStream = openFileDialog2.OpenFile();
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        fileContent = reader.ReadToEnd();
+                    }
+                }
+                catch (IOException)
+                { }
+                Key = Encoding.ASCII.GetBytes(fileContent);
+                MessageBox.Show("I'm loading the key.......");
+
+            }
         }
     }
 }
