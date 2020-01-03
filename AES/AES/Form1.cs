@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using System.Runtime.InteropServices;
 namespace AES
 {
     public partial class Form1 : Form
@@ -36,16 +36,19 @@ namespace AES
                 try
                 {
                     filePath = openFileDialog1.FileName;
-                    var fileStream = openFileDialog1.OpenFile();
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                        fileContent = reader.ReadToEnd();
-                    }
+                    //var fileStream = openFileDialog1.OpenFile();
+                    //using (StreamReader reader = new StreamReader(fileStream))
+                    //{
+                    //    fileContent = reader.ReadToEnd();
+                    //}
+                    buffer = File.ReadAllBytes(filePath);
                 }
                 catch (IOException)
                 { }
                 //MessageBox.Show(fileContent,filePath,MessageBoxButtons.OK);
-                sampleText = fileContent;
+                //sampleText = fileContent;
+                // buffer = Encoding.UTF8.GetBytes(sampleText);
+                sampleText = Encoding.UTF8.GetString(buffer);
               
             }
         }
@@ -58,91 +61,54 @@ namespace AES
             {
                 string filePath = string.Empty;
                 string fileContent = string.Empty;
+                //string keyContent = string.Empty;
 
                 try
                 {
                     filePath = saveFileDialog1.FileName;
-                    var fileStream = saveFileDialog1.OpenFile();
+                 //   var fileStream = saveFileDialog1.OpenFile();
+                    //    using (StreamWriter writer = new StreamWriter(fileStream))
+                    //    {
+                    //        fileContent = Encoding.UTF8.GetString(buffer);
+                    //        writer.Write(fileContent);
+                    //    }
+                    //}
+                    //  using (BinaryWriter writer = new BinaryWriter(fileStream))
+                    //    {
+                    //        writer.Write(buffer);
+                    //        writer.Flush();
+                    //        writer.Close();
+                    //    }
+                    File.WriteAllBytes(filePath, buffer);
+            }
 
-                    using (BinaryWriter writer = new BinaryWriter(fileStream))
-                    {
-                        writer.Write(buffer);
-                        writer.Flush();
-                        writer.Close();
-                    }
-                }
                 catch (IOException) { }
        
             }
             try
             {
-                using (Stream file = File.OpenWrite("here.txt"))
-                {
-                    file.Write(fileBytes, 0, fileBytes.Length);
-                }
+                File.WriteAllBytes("Key", Key);
+               // using (BinaryWriter writer = new BinaryWriter(File.Open("Key", FileMode.Create)))
+               // {
+
+                 //   string keyContent = Encoding.UTF8.GetString(Key);
+                  //  MessageBox.Show(keyContent);
+                  //  writer.Write(keyContent);
+                  //  writer.Write(Key);
+
+              //  }
             }
-            catch (IOException)
-            { }
+            catch { }
+
+
         }
-  
-        
-     
-
-        private void DecryptButton(object sender, EventArgs e)
-        {
-           // Aes myAes = Aes.Create();
-            //myAes.GenerateKey();
-            //myAes.GenerateIV();
-            // Check arguments.
-            if (sampleText == null || sampleText.Length <= 0)
-                throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
-
-            // Declare the string used to hold
-            // the decrypted text.
-            string plaintext = null;
-
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-                aesAlg.Padding = PaddingMode.Zeros;
-                // Create a decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for decryption.
-                using (MemoryStream msDecrypt = new MemoryStream(buffer))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
-                            plaintext = srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-
-            }
-            sampleText = plaintext;
-       //     MessageBox.Show(sampleText);
-            buffer = Encoding.ASCII.GetBytes(plaintext);
-        }
-
         private void EncryptButton(object sender, EventArgs e)
         {
             Aes myAes = Aes.Create();
             myAes.GenerateKey();
-            myAes.GenerateIV();
-           // Key = myAes.Key;
-            IV = myAes.IV;
+          //  myAes.GenerateIV();
+            Key = myAes.Key;
+            myAes.IV = IV;
             Key = myAes.Key;
             // Check arguments.
             if (sampleText == null || sampleText.Length <= 0)
@@ -186,6 +152,64 @@ namespace AES
             MessageBox.Show(sampleText);
         }
 
+
+
+
+        private void DecryptButton(object sender, EventArgs e)
+        {
+           // Aes myAes = Aes.Create();
+            //myAes.GenerateKey();
+          //  myAes.GenerateIV();
+         //   IV = myAes.IV;
+            // Check arguments.
+            if (sampleText == null || sampleText.Length <= 0)
+                throw new ArgumentNullException("plainText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                //    var key = new Rfc2898DeriveBytes(, , 1000);
+                //  AES.Key = key.GetBytes(AES.KeySize / 8);
+                //AES.IV = key.GetBytes(AES.BlockSize / 8);
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
+                aesAlg.Padding = PaddingMode.Zeros;
+                // Create a decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(buffer))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+
+                    }
+                }
+
+            }
+            sampleText = plaintext;
+            MessageBox.Show(sampleText);
+            buffer = Encoding.UTF8.GetBytes(sampleText);
+        }
+
+        
+
         private void LoadKeyButton(object sender, EventArgs e)
         {
             DialogResult res = openFileDialog2.ShowDialog();
@@ -196,17 +220,19 @@ namespace AES
 
                 try
                 {
-                    filePath = openFileDialog2.FileName;
-                    var fileStream = openFileDialog2.OpenFile();
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                        fileContent = reader.ReadToEnd();
-                    }
+                    //filePath = openFileDialog2.FileName;
+                  //  var fileStream = openFileDialog2.OpenFile();
+                  //  using (StreamReader reader = new StreamReader(fileStream))
+                  //  {
+                  //      fileContent = reader.ReadToEnd();
+                        Key=File.ReadAllBytes("Key");
+                 //   }
                 }
                 catch (IOException)
                 { }
-                Key = Encoding.ASCII.GetBytes(fileContent);
-                MessageBox.Show("I'm loading the key.......");
+              //  Key = Encoding.UTF8.GetBytes(fileContent);
+                MessageBox.Show(fileContent);
+
 
             }
         }
