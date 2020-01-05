@@ -10,18 +10,25 @@ namespace AES
 {
     class MyAES
     {
+
         private byte[] buffer;
         private byte[] Key;
         private byte[] IV = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
-        private byte[] Encrypt(byte[] toEncrypt)
-        {
-            Aes myAes = Aes.Create();
+        public MyAES(byte[] msg,byte[] key) {
+            buffer = msg;
+            Key = key;
+        }
+        public MyAES(byte[] msg) {
+            buffer = msg;
+        }
+        public byte[] Encrypt()
+        { 
+           Aes myAes;
+            myAes = Aes.Create();
             myAes.GenerateKey();
-            //  myAes.GenerateIV();
-            Key = myAes.Key;
             myAes.IV = IV;
             Key = myAes.Key;
-            string sampleText = Encoding.UTF8.GetString(toEncrypt);
+            string sampleText = Encoding.UTF8.GetString(buffer);
             // Check arguments.
             if (sampleText == null || sampleText.Length <= 0)
                 throw new ArgumentNullException("plainText");
@@ -58,10 +65,11 @@ namespace AES
             buffer = encrypted;
             return encrypted;
         }
-        public byte[] Decrypt(byte[] toDecrypt) {
-            string sampleText = Encoding.UTF8.GetString(toDecrypt);
+    
+    
+        public byte[] Decrypt() {
 
-            if (sampleText == null || sampleText.Length <= 0)
+            if (buffer == null || buffer.Length <= 0)
                 throw new ArgumentNullException("plainText");
             if (Key == null || Key.Length <= 0)
                 throw new ArgumentNullException("Key");
@@ -81,7 +89,7 @@ namespace AES
                 //AES.IV = key.GetBytes(AES.BlockSize / 8);
                 aesAlg.Key = Key;
                 aesAlg.IV = IV;
-                aesAlg.Padding = PaddingMode.Zeros;
+                aesAlg.Padding = PaddingMode.None;
                 // Create a decryptor to perform the stream transform.
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
@@ -104,5 +112,8 @@ namespace AES
             }
             return Encoding.UTF8.GetBytes(plaintext);
         }
+
+        public byte[] getKey() { return Key; }
     }
+  
 }
