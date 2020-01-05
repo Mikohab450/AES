@@ -130,7 +130,7 @@
         private string sampleText;
         private byte[] buffer;
         private byte[] Key;
-        private byte[] IV = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+
         private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
     }
