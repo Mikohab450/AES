@@ -15,6 +15,10 @@ namespace AES
 {
     public partial class Form1 : Form
     {
+        [DllImport(@"../../../x64/Debug/AES_ASM.dll")]
+        public static extern void AESEncryption(long[] word, long[] stringList, long amount);
+
+
         public Form1()
         {
             InitializeComponent();
@@ -25,13 +29,26 @@ namespace AES
         {
 
         }
-        private void EncryptButton(object sender, EventArgs e) {
+        private  void EncryptButton(object sender, EventArgs e) {
             if (C.Checked)
             {
                 aes = new MyAES(buffer);
                 buffer = aes.Encrypt();
                 key = aes.getKey();
                 MessageBox.Show("Encrypted!");
+            }
+            if (A.Checked)
+            {
+               long[] test={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                unsafe
+                {
+                    fixed (long* t = &test[0])
+                    {
+                        AESEncryption(test, test, 10);
+                    }
+                }
+
+                
             }
         }
 

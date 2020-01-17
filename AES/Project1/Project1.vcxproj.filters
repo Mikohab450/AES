@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="AES.asm">
+    <MASM Include="dll.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AES.def">
+    <None Include="dll.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

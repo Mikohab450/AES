@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES", "AES\AES.csproj", "{58BFD81C-8290-42E4-9A25-3AEA65722F00}"
+	ProjectSection(ProjectDependencies) = postProject
+		{98F64D3B-13EC-48DE-A950-E09665A1288E} = {98F64D3B-13EC-48DE-A950-E09665A1288E}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project1", "Project1\Project1.vcxproj", "{98F64D3B-13EC-48DE-A950-E09665A1288E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AES_ASM", "Project1\Project1.vcxproj", "{98F64D3B-13EC-48DE-A950-E09665A1288E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,7 +32,8 @@ Global
 		{58BFD81C-8290-42E4-9A25-3AEA65722F00}.Release|x64.Build.0 = Release|Any CPU
 		{58BFD81C-8290-42E4-9A25-3AEA65722F00}.Release|x86.ActiveCfg = Release|Any CPU
 		{58BFD81C-8290-42E4-9A25-3AEA65722F00}.Release|x86.Build.0 = Release|Any CPU
-		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|Any CPU.Build.0 = Debug|x64
 		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|x64.ActiveCfg = Debug|x64
 		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|x64.Build.0 = Debug|x64
 		{98F64D3B-13EC-48DE-A950-E09665A1288E}.Debug|x86.ActiveCfg = Debug|Win32
