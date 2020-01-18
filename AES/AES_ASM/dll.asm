@@ -5,7 +5,7 @@
 
 
 
-AESEncryption PROC
+AESEncryption PROC myInt:QWORD
 
 AESEncryption ENDP
 END

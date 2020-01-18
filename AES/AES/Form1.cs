@@ -19,7 +19,7 @@ namespace AES
     public partial class Form1 : Form
     {
         [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
-        public static extern void AESEncryption();//long[] word, long[] stringList, long stringNumber);
+        public static extern void AESEncryption(int m);//long[] word, long[] stringList, long stringNumber);
 
 
         public Form1()
@@ -46,16 +46,16 @@ namespace AES
             if (A.Checked)
             {
                 long []testc= new long[4];
-                unsafe
-                {
-                    fixed (byte* t = &buffer[0])
-                    {
-                        fixed (byte* k = &key[0])
-                            AESEncryption();// testc,testc,5);
+             //   unsafe
+             //   {
+                   // fixed (byte* t = &buffer[0])
+                 //   {
+                   //     fixed (byte* k = &key[0])
+                            AESEncryption(4);// testc,testc,5);
                      //   MessageBox.Show();
-                        int a=5;
-                    }
-                }
+                //        int a=5;
+                 //   }
+             //   }
 
                 
             }
