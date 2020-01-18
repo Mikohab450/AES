@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,12 +13,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
+
 namespace AES
 {
     public partial class Form1 : Form
     {
-        [DllImport(@"../../../x64/Debug/AES_ASM.dll")]
-        public static extern void AESEncryption(long[] word, long[] stringList, long amount);
+        [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
+        public static extern void AESEncryption();//long[] word, long[] stringList, long stringNumber);
 
 
         public Form1()
@@ -30,6 +33,9 @@ namespace AES
 
         }
         private  void EncryptButton(object sender, EventArgs e) {
+            //FOR TESTING PURPOSES BUFFER IS FILLED HERE
+            buffer=new byte[] {0,1,2,3,4,5,6};
+            key = new byte[32];
             if (C.Checked)
             {
                 aes = new MyAES(buffer);
@@ -39,12 +45,15 @@ namespace AES
             }
             if (A.Checked)
             {
-               long[] test={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                long []testc= new long[4];
                 unsafe
                 {
-                    fixed (long* t = &test[0])
+                    fixed (byte* t = &buffer[0])
                     {
-                        AESEncryption(test, test, 10);
+                        fixed (byte* k = &key[0])
+                            AESEncryption();// testc,testc,5);
+                     //   MessageBox.Show();
+                        int a=5;
                     }
                 }
 
