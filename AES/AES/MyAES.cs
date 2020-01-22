@@ -14,6 +14,7 @@ namespace AES
         private byte[] buffer;
         private byte[] Key;
         private byte[] IV = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        private byte[][] keyExpand;
         public MyAES(byte[] msg,byte[] key) {
             buffer = msg;
             Key = key;
@@ -21,6 +22,11 @@ namespace AES
         public MyAES(byte[] msg) {
             buffer = msg;
         }
+        public void expandKey() {
+            keyExpand = new byte[15][];
+
+            }
+
         public byte[] Encrypt()
         { 
            Aes myAes;

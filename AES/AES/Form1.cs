@@ -19,7 +19,7 @@ namespace AES
     public partial class Form1 : Form
     {
         [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
-        public static extern void AESEncryption(int m);//long[] word, long[] stringList, long stringNumber);
+        unsafe public static extern void AESEncryption(byte * buf,byte* key,byte* done,uint MsgSize);
 
 
         public Form1()
@@ -34,7 +34,7 @@ namespace AES
         }
         private  void EncryptButton(object sender, EventArgs e) {
             //FOR TESTING PURPOSES BUFFER IS FILLED HERE
-            buffer=new byte[] {0,1,2,3,4,5,6};
+            buffer=new byte[] {0,1,2,3,4,5,6,7};
             key = new byte[32];
             if (C.Checked)
             {
@@ -45,17 +45,23 @@ namespace AES
             }
             if (A.Checked)
             {
-                long []testc= new long[4];
-             //   unsafe
-             //   {
-                   // fixed (byte* t = &buffer[0])
-                 //   {
-                   //     fixed (byte* k = &key[0])
-                            AESEncryption(4);// testc,testc,5);
-                     //   MessageBox.Show();
-                //        int a=5;
-                 //   }
-             //   }
+                Aes temp;
+                temp = Aes.Create();
+                temp.GenerateKey();
+                key = temp.Key;
+                unsafe
+                {
+                    byte[] nw = new byte[3];
+                    fixed (byte* t = &buffer[0])
+                    {
+                        fixed (byte* k = &key[0])
+                        fixed (byte* m = &nw[0])
+                        {
+                            AESEncryption(t, k,m, 5);
+                        }
+
+                    }
+               }
 
                 
             }
