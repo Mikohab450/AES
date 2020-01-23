@@ -19,7 +19,7 @@ namespace AES
     public partial class Form1 : Form
     {
         [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
-        unsafe public static extern void AESEncryption(byte * buf,byte* key,byte* done,uint MsgSize);
+        unsafe public static extern void AESEncryption(byte * buf,byte* key,byte* done);
 
 
         public Form1()
@@ -35,29 +35,31 @@ namespace AES
         private  void EncryptButton(object sender, EventArgs e) {
             //FOR TESTING PURPOSES BUFFER IS FILLED HERE
             buffer=new byte[] {0,1,2,3,4,5,6,7};
-            key = new byte[32];
+       //    
             if (C.Checked)
             {
                 aes = new MyAES(buffer);
                 buffer = aes.Encrypt();
                 key = aes.getKey();
-                MessageBox.Show("Encrypted!");
+                MessageBox.Show(Encoding.UTF8.GetString(buffer));
             }
             if (A.Checked)
             {
-                Aes temp;
-                temp = Aes.Create();
-                temp.GenerateKey();
-                key = temp.Key;
+               aes= new MyAES(buffer);
+                byte[,]roundKey = new byte[60,4];
+                key = aes.getKey();
+                roundKey = aes.getRoundKeys();
                 unsafe
                 {
-                    byte[] nw = new byte[3];
+                    byte[] nw = new byte[buffer.Length];
                     fixed (byte* t = &buffer[0])
                     {
-                        fixed (byte* k = &key[0])
-                        fixed (byte* m = &nw[0])
+                        fixed (byte* k = &roundKey[0,0])
                         {
-                            AESEncryption(t, k,m, 5);
+                            fixed (byte* m = &nw[0])
+                            {
+                                AESEncryption(t, k, m);
+                            }
                         }
 
                     }
@@ -76,7 +78,7 @@ namespace AES
             {
                 aes = new MyAES(buffer, key);
                 buffer = aes.Decrypt();
-                MessageBox.Show("Decrypted!");
+                MessageBox.Show(Encoding.UTF8.GetString(buffer));
             }
         }
 
