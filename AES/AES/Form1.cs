@@ -12,20 +12,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using System.Diagnostics;
 
 namespace AES
 {
     public partial class Form1 : Form
     {
         [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
-        unsafe public static extern void AESEncryption(byte * buf,byte* key,byte* done);
-
+        unsafe public static extern void AESEncryption(byte * buf,byte* key,byte* done,int n);
+        [DllImport(@"C:\Users\Mikolaj\Documents\JA\JA\AES\x64\Debug\AES_ASM.dll")]
+        unsafe public static extern void AESDecryption(byte* buf, byte* key, byte* done,int n);
 
         public Form1()
         {
             InitializeComponent();
-          
+            //aes = new MyAES(buffer);
+           sw = new Stopwatch();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -33,40 +35,64 @@ namespace AES
 
         }
         private  void EncryptButton(object sender, EventArgs e) {
-            //FOR TESTING PURPOSES BUFFER IS FILLED HERE
-            buffer=new byte[] {0,1,2,3,4,5,6,7};
-       //    
+                    
+            if (key == null || key.GetLength(0) == 0)
+                aes = new MyAES(buffer);
+            else aes = new MyAES(buffer, key);
             if (C.Checked)
             {
-                aes = new MyAES(buffer);
+            //    sw.Start();
                 buffer = aes.Encrypt();
+          //      sw.Stop();
                 key = aes.getKey();
-                MessageBox.Show(Encoding.UTF8.GetString(buffer));
+                
+         //       MessageBox.Show(sw.ElapsedMilliseconds.ToString());
             }
-            if (A.Checked)
+            else if (A.Checked)
             {
-               aes= new MyAES(buffer);
+
+                int size = buffer.Length;
+            
                 byte[,]roundKey = new byte[60,4];
                 key = aes.getKey();
-                roundKey = aes.getRoundKeys();
+                roundKey = aes.getRoundKeys(1);
+                byte[] dataOut;
+                int blocks;
+                if (size < 16)
+                {
+                    dataOut = new byte[16];
+                    blocks = 1;
+                }
+                else
+                {
+                    blocks = size / 16;
+                    dataOut = new byte[size];
+                }
+
                 unsafe
                 {
-                    byte[] nw = new byte[buffer.Length];
+
                     fixed (byte* t = &buffer[0])
                     {
                         fixed (byte* k = &roundKey[0,0])
                         {
-                            fixed (byte* m = &nw[0])
+                            fixed (byte* resultRef = &dataOut[0])
                             {
-                                AESEncryption(t, k, m);
+                              //  sw.Reset()
+                                //sw.Start();  //stoper do mierzenia czasu wykonania
+                                AESEncryption(t, k, resultRef, blocks);
+                            //    sw.Stop();
+                           //     MessageBox.Show(sw.ElapsedMilliseconds.ToString());
+
                             }
                         }
 
                     }
                }
-
+                Buffer = dataOut;       //zapis
                 
             }
+            MessageBox.Show("Encrypted!");
         }
 
 
@@ -74,12 +100,60 @@ namespace AES
 
         private void DecryptButton(object sender, EventArgs e)
         {
+            if (key != null || key.GetLength(0) != 0)
+                aes = new MyAES(buffer,key);
+            
             if (C.Checked)
             {
-                aes = new MyAES(buffer, key);
+                //   sw.Reset();           //stoper do mierzenia czasu wykonania
+                //sw.Start();
                 buffer = aes.Decrypt();
-                MessageBox.Show(Encoding.UTF8.GetString(buffer));
+              //  sw.Stop();
+
+            //    MessageBox.Show(sw.ElapsedMilliseconds.ToString());
             }
+            else if (A.Checked)
+            {
+
+                int size = buffer.Length;
+                byte[,] roundKey = new byte[60, 4];
+
+                roundKey = aes.getRoundKeys(2);
+                byte[] dataOut;
+                int blocks;
+                if (size < 16)
+                {
+                    dataOut = new byte[16];
+                    blocks = 1;
+                }
+                else
+                {
+                    blocks = size / 16;
+                    dataOut = new byte[size];
+                }
+
+                unsafe
+                {
+                    fixed (byte* t = &buffer[0])
+                    {
+                        fixed (byte* k = &roundKey[0, 0])
+                        {
+                            fixed (byte* resultRef = &dataOut[0])
+                            {
+                             //   sw.Reset();       //stoper do mierzenia czasu wykonania
+                            //    sw.Start();
+                                   AESDecryption(t, k, resultRef, blocks);
+                          //      sw.Stop();
+                          //      MessageBox.Show(sw.ElapsedMilliseconds.ToString());
+                            }
+                        }
+
+                    }
+
+                    Buffer = dataOut;       //zapis
+                }
+            }
+            MessageBox.Show("Decrypted!");
         }
 
         private void LoadFileButton(object sender, EventArgs e)
@@ -94,11 +168,12 @@ namespace AES
                 {
                     filePath = openFileDialog1.FileName;
                     buffer = File.ReadAllBytes(filePath);
+                    if (buffer.GetLength(0) == 0) { MessageBox.Show("PLik jest pusty!"); }
                 }
                 catch (IOException)
                 { }         
             }
-            MessageBox.Show("File loaded!");
+            
         }
       
 
@@ -113,7 +188,7 @@ namespace AES
                try
                 {
                     filePath = saveFileDialog1.FileName;
-                    File.WriteAllBytes(filePath, buffer);
+                    File.WriteAllBytes(filePath, aes.WriteBuffer());
                     File.WriteAllBytes("Key", key);
                 }
 
@@ -137,7 +212,7 @@ namespace AES
                 catch (IOException)
                 { }
             }
-            MessageBox.Show("Loaded Key!");
+            //MessageBox.Show("Loaded Key!");
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)

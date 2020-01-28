@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,34 +10,44 @@ using System.Threading.Tasks;
 namespace AES
 {
     class MyAES
-    {
+    {   
+
         private Aes myAes;
         private byte[,] Sbox;
         private byte[,] iSbox;
         private byte[,] Rcon;
         private byte[] buffer;
-        private byte[] Key;
+        private byte[] Key;//= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
         private byte[] IV = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
-        private byte[,] keyScheduleArray;      
+        private byte[,] keyScheduleArray;
+        private int mode=0;
         public MyAES(byte[] msg, byte[] key) {
             buffer = msg;
-            Key = key;
-        }
-        public MyAES(byte[] msg) {
-            buffer = msg;
-         //   keyScheduleArray = new byte[32];
             BuildSbox();
             BuildInvSbox();
             BuildRcon();
-            
+            myAes = Aes.Create();
+            Key = key;
+            myAes.IV = IV;
+            myAes.Key = Key;
+            this.KeyExpansion();
+        }
+        public MyAES(byte[] msg) {
+            buffer = msg;
+            BuildSbox();
+            BuildInvSbox();
+            BuildRcon();
+
             myAes = Aes.Create();
             myAes.GenerateKey();
+
             myAes.IV = IV;
             Key = myAes.Key;
             this.KeyExpansion();
         }
-        public byte[,] getRoundKeys()
-        { return keyScheduleArray; }
+        public byte[,] getRoundKeys(int i)
+        { mode = i;
+          return keyScheduleArray; }
         private void BuildRcon()
         {
             Rcon = new byte[11, 4] { {0x00, 0x00, 0x00, 0x00},
@@ -133,11 +144,20 @@ namespace AES
                 this.keyScheduleArray[row, 2] = (byte)((int)this.keyScheduleArray[row - 8, 2] ^ (int)temp[2]);
                 this.keyScheduleArray[row, 3] = (byte)((int)this.keyScheduleArray[row - 8, 3] ^ (int)temp[3]);
 
-            } 
-        }  
+            }
+            int a = 0;
+            for (int i = 0; i < 60; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    keyScheduleArray[i, j] = Convert.ToByte(a);
+                    a++;
+                }
+            }
+        }
 
         public byte[] Encrypt()
-        { 
+        {
 
             string sampleText = Encoding.UTF8.GetString(buffer);
             // Check arguments.
@@ -167,6 +187,7 @@ namespace AES
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
                             //Write all data to the stream.
+
                             swEncrypt.Write(sampleText);
                         }
                         encrypted = msEncrypt.ToArray();
@@ -176,8 +197,16 @@ namespace AES
             buffer = encrypted;
             return encrypted;
         }
-    
-    
+
+        public void InverseKey(){
+            for (int i = 2; i < 58; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+
+                }
+            }
+            }
         public byte[] Decrypt() {
 
             if (buffer == null || buffer.Length <= 0)
@@ -223,7 +252,13 @@ namespace AES
             }
             return Encoding.UTF8.GetBytes(plaintext);
         }
-
+        public byte[] WriteBuffer() {
+            if (mode == 1) return Encrypt();
+            else if (mode == 2)
+                return Decrypt();
+            else
+                return buffer; 
+}
         public byte[] getKey() { return Key; }
         private byte[] SubWord(byte[] word)
         {

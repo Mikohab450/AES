@@ -1,4 +1,6 @@
-﻿namespace AES
+﻿using System.Diagnostics;
+
+namespace AES
 {
     partial class Form1
     {
@@ -162,6 +164,8 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.RadioButton C;
         private System.Windows.Forms.RadioButton A;
+        private byte[] Buffer;
+        private Stopwatch sw;
     }
 }
 
